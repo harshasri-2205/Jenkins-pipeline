@@ -1,6 +1,6 @@
 pipeline {
     agent any
-    tools { nodejs "NodeJS-18" }  // Ensure Jenkins uses the installed Node.js version
+    tools { nodejs "node" }  // Ensure Jenkins uses the installed Node.js version
     stages {
         stage('Install Dependencies') {
             steps {
