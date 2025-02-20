@@ -3,8 +3,7 @@ pipeline {
     tools { nodejs "node" }  // Ensure Jenkins uses the installed Node.js version
     environment {
         imageName = "harsha2001/react-app"
-        registryCredentials = credentials('harsha2001')
-        dockerImage = ""
+        registryCredentials = 'dockerhub-cred'  // Use correct credentials ID
     }
 
     stages {
@@ -24,15 +23,20 @@ pipeline {
         }
         stage('Build Image') {
             steps {
-                echo "Building image"
-               dockerImage = docker.build imageName
+                script {
+                    echo "Building Docker image"
+                    dockerImage = docker.build("${imageName}:${env.BUILD_NUMBER}")
+                }
             }
         }
         stage('Deploy Image') {
             steps {
-                echo "Deploying image"
-                docker.withRegistry('https://registry.hub.docker.com', 'dockerhub-cred') {
-                    dockerImage.push(${env.BUILD_NUMBER})
+                script {
+                    echo "Deploying image"
+                    docker.withRegistry('https://registry.hub.docker.com', registryCredentials) {
+                        dockerImage.push("${env.BUILD_NUMBER}")
+                        dockerImage.push("latest")  // Push as latest for easier deployment
+                    }
                 }
             }
         }
